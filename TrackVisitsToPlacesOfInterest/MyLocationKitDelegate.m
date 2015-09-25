@@ -24,6 +24,9 @@
 // filters you've set when initializing LocationKit.
 - (void)locationKit:(LocationKit *)locationKit didStartVisit:(LKVisit *)visit {
     NSLog(@"LocationKit detected that a visit started at %@ to %@", visit.arrivalDate, visit.place.venue.name);
+
+    // Here you could fire off a REST API call to register this visit with our (hypothetical) servers. It will fire
+    // and make the REST call even while your app is in the background.
 }
 
 @end
