@@ -7,6 +7,8 @@
 //
 
 #import "AppDelegate.h"
+#import <LocationKit/LocationKit.h>
+#import "MyLocationKitDelegate.h"
 
 @interface AppDelegate ()
 
@@ -14,32 +16,35 @@
 
 @implementation AppDelegate
 
+MyLocationKitDelegate *mlkDelegate;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    // Initialize LocationKit with a single filter, in this case triggering
+    // whenever a user visits a Starbucks. Can add multiple filters (it's an
+    // array) so you could trigger for any of your partners.
+
+    // 1. Create the filter
+    LKFilter *starbucks = [[LKFilter alloc] init];
+    // 2. Assign the criteria, in this case a name of Starbucks
+    starbucks.venueName = @"Starbucks";
+
+    // 3. Let's add another filter so this fires on visits to both Starbucks and any breweries
+    LKFilter *breweries = [[LKFilter alloc] init];
+    breweries.venueCategory = @"Breweries";
+
+    // 3. Make it an array (because LocationKit will accept multiple filters)
+    NSArray *myFilters = [NSArray arrayWithObjects:starbucks, breweries, nil];
+
+    // 4. Add it to the list of options when launching LocationKit
+    NSDictionary *options = @{ LKOptionFilter: myFilters };
+    
+    // 5. Instantiate our Delegate
+    mlkDelegate = [[MyLocationKitDelegate alloc] init];
+    
+    // 5. Initialize LocationKit with those options
+    [[LocationKit sharedInstance] startWithApiToken:@"myToken" delegate:mlkDelegate options:options];
+    
     return YES;
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application {
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
 @end
